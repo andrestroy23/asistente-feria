@@ -1,35 +1,11 @@
 import { useState } from 'react'
+import heroImg from './assets/hero.png'
+import reactLogo from './assets/react.svg'
+import viteLogo from './assets/vite.svg'
 import './App.css'
 
 function App() {
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: '¡Hola! 🤖 Bienvenid@ a la Feria. Pregúntame sobre horarios, stands o eventos.' }
-  ])
-  const [input, setInput] = useState('')
-
-  const handleSend = (e) => {
-    e.preventDefault()
-    if (!input.trim()) return
-
-    const userText = input
-    setMessages((prev) => [...prev, { role: 'user', content: userText }])
-    setInput('')
-
-    setTimeout(() => {
-      let botResponse = `Interesante pregunta sobre "${userText}". ¿Te gustaría saber sobre horarios o ubicaciones de los stands?`
-      const text = userText.toLowerCase()
-
-      if (text.includes('horario') || text.includes('hora')) {
-        botResponse = '⏰ La feria atiende de 9:00 AM a 6:00 PM.'
-      } else if (text.includes('donde') || text.includes('lugar') || text.includes('ubicacion')) {
-        botResponse = '📍 Nos encontramos en el Pabellón Principal de Exposición.'
-      } else if (text.includes('stand') || text.includes('comida') || text.includes('locales')) {
-        botResponse = '🏢 Hay más de 30 stands de tecnología, artesanías y gastronomía.'
-      }
-
-      setMessages((prev) => [...prev, { role: 'assistant', content: botResponse }])
-    }, 300)
-  }
+  const [count, setCount] = useState(0)
 
   return (
     <>
