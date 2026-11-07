@@ -128,6 +128,8 @@ function App() {
       // 🔑 Tu API Key de OpenRouter (empieza con sk-or-v1-...)
       const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 
+      console.log("Valor de la API Key:", API_KEY ? "¡Cargada correctamente!" : "¡ESTÁ VACÍA O INDEFINIDA!");
+
       const apiMessages = [
         {
           role: "system",
