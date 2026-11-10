@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import { get, set } from 'idb-keyval'
 import './App.css'
 
-// Iconos vectoriales de precisión tecnica (sin uso de emojis)
+// Iconos vectoriales de precisión tecnica
 const IconPlus = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -79,7 +79,7 @@ const IconClose = () => (
   </svg>
 )
 
-// Optimizador y compresor de matrices de imagen para almacenamiento y transmision
+// Compresor de imágenes
 const compressImage = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -112,19 +112,18 @@ const compressImage = (file) => {
         const compressed = canvas.toDataURL('image/jpeg', 0.8)
         resolve(compressed)
       }
-      img.onerror = () => reject(new Error('Fallo en decodificacion de matriz visual'))
+      img.onerror = () => reject(new Error('Fallo en decodificación de imagen'))
       img.src = e.target.result
     }
-    reader.onerror = () => reject(new Error('Fallo en lectura de archivo binario'))
+    reader.onerror = () => reject(new Error('Fallo en lectura de archivo'))
     reader.readAsDataURL(file)
   })
 }
 
-// Limpieza y adaptacion fonetica del texto Markdown para sintesis de voz natural y fluida
+// Limpieza para síntesis de voz
 const cleanTextForSpeech = (markdownText) => {
   if (!markdownText) return ''
   let text = markdownText
-
   text = text.replace(/```[\s\S]*?```/g, '. Código detallado en pantalla. ')
   text = text.replace(/`([^`]+)`/g, '$1')
   text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
@@ -137,7 +136,6 @@ const cleanTextForSpeech = (markdownText) => {
   text = text.replace(/(\/\/|::)/g, ', ')
   text = text.replace(/[\[\]{}]/g, '')
   text = text.replace(/\s+/g, ' ').trim()
-
   return text
 }
 
@@ -169,39 +167,15 @@ function App() {
 
       if (spanishVoices.length > 0 && !selectedVoiceName) {
         const naturalVoice =
-          spanishVoices.find(v => v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online (Natural)')) ||
-          spanishVoices.find(v => v.name.toLowerCase().includes('google')) ||
-          spanishVoices.find(v => v.name.toLowerCase().includes('microsoft')) ||
-          spanishVoices[0]
-
-        if (naturalVoice) {
-          setSelectedVoiceName(naturalVoice.name)
-        }
+          spanishVoices.find(v => v.name.includes('Natural') || v.name.includes('Neural')) || spanishVoices[0]
+        if (naturalVoice) setSelectedVoiceName(naturalVoice.name)
       }
     }
-
     loadVoices()
     if (window.speechSynthesis) {
       window.speechSynthesis.onvoiceschanged = loadVoices
     }
-
-    return () => {
-      if (speechIntervalRef.current) {
-        clearInterval(speechIntervalRef.current)
-      }
-    }
   }, [selectedVoiceName])
-
-  useEffect(() => {
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.abort()
-      }
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel()
-      }
-    }
-  }, [])
 
   useEffect(() => {
     const loadDB = async () => {
@@ -231,7 +205,7 @@ function App() {
     const initialMsg = [
       {
         role: 'assistant',
-        content: 'SISTEMA INICIALIZADO // Núcleo de asistencia cognitiva activo.\n\nCapacidades del entorno:\nInferencia neural multimodal (texto, código y análisis de imágenes).\nEntrada de audio continua y síntesis de voz en español.\nPersistencia de datos en almacenamiento local (IndexedDB).\n\nIngrese un comando, consulta o cargue un archivo visual para comenzar.'
+        content: 'SISTEMA INICIALIZADO // Núcleo DeepSeek activo.\n\nCapacidades:\n- Procesamiento de texto y código técnico.\n- Generación de imágenes mediante comandos.\n- Síntesis de voz y persistencia local.\n\nIngrese una consulta o escriba "crear imagen de [descripción]" para generar gráficos.'
       }
     ]
     const newSession = {
@@ -270,69 +244,46 @@ function App() {
   const handleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
-      alert("Navegador incompatible con el transductor de voz. Utilice Google Chrome o Microsoft Edge.")
+      alert("Navegador incompatible con reconocimiento de voz.")
       return
     }
 
     if (isListeningRef.current) {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop()
-      }
+      recognitionRef.current?.stop()
       setIsListening(false)
       isListeningRef.current = false
       return
     }
 
     try {
-      if (recognitionRef.current) {
-        recognitionRef.current.abort()
-      }
-
       const recognition = new SpeechRecognition()
       recognition.lang = 'es-ES'
       recognition.continuous = true
       recognition.interimResults = true
-
       baseInputRef.current = input ? input.trim() + ' ' : ''
 
       recognition.onstart = () => {
         setIsListening(true)
         isListeningRef.current = true
       }
-
       recognition.onresult = (event) => {
-        let sessionTranscript = ''
+        let transcript = ''
         for (let i = 0; i < event.results.length; i++) {
-          sessionTranscript += event.results[i][0].transcript
+          transcript += event.results[i][0].transcript
         }
-        setInput(baseInputRef.current + sessionTranscript)
+        setInput(baseInputRef.current + transcript)
       }
-
-      recognition.onerror = (event) => {
-        console.warn("Error en transductor de audio:", event.error)
-        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-          alert("Acceso al micrófono denegado en la configuración del navegador.")
-          setIsListening(false)
-          isListeningRef.current = false
-        } else if (event.error === 'audio-capture') {
-          alert("Dispositivo de entrada de audio no detectado en el hardware.")
-          setIsListening(false)
-          isListeningRef.current = false
-        } else if (event.error !== 'no-speech') {
-          setIsListening(false)
-          isListeningRef.current = false
-        }
+      recognition.onerror = () => {
+        setIsListening(false)
+        isListeningRef.current = false
       }
-
       recognition.onend = () => {
         setIsListening(false)
         isListeningRef.current = false
       }
-
       recognitionRef.current = recognition
       recognition.start()
     } catch (err) {
-      console.error("Fallo al inicializar transductor:", err)
       setIsListening(false)
       isListeningRef.current = false
     }
@@ -340,84 +291,39 @@ function App() {
 
   const speakText = (text, idx) => {
     if (!window.speechSynthesis) return
-
-    if (speechIntervalRef.current) {
-      clearInterval(speechIntervalRef.current)
-      speechIntervalRef.current = null
-    }
-
     if (speakingIdx === idx && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel()
       setSpeakingIdx(null)
       return
     }
-
     window.speechSynthesis.cancel()
-
     const naturalSpeech = cleanTextForSpeech(text)
     if (!naturalSpeech) return
 
     const utterance = new SpeechSynthesisUtterance(naturalSpeech)
     utterance.lang = 'es-ES'
     utterance.rate = 0.98
-    utterance.pitch = 1.0
 
     if (selectedVoiceName && availableVoices.length > 0) {
       const voiceObj = availableVoices.find(v => v.name === selectedVoiceName)
-      if (voiceObj) {
-        utterance.voice = voiceObj
-        utterance.lang = voiceObj.lang
-      }
-    } else if (availableVoices.length > 0) {
-      const best = availableVoices.find(v => v.name.includes('Natural') || v.name.includes('Neural')) || availableVoices[0]
-      if (best) {
-        utterance.voice = best
-        utterance.lang = best.lang
-      }
+      if (voiceObj) utterance.voice = voiceObj
     }
 
-    utterance.onstart = () => {
-      setSpeakingIdx(idx)
-    }
-
-    utterance.onend = () => {
-      if (speechIntervalRef.current) {
-        clearInterval(speechIntervalRef.current)
-      }
-      setSpeakingIdx(null)
-    }
-
-    utterance.onerror = () => {
-      if (speechIntervalRef.current) {
-        clearInterval(speechIntervalRef.current)
-      }
-      setSpeakingIdx(null)
-    }
-
-    speechIntervalRef.current = setInterval(() => {
-      if (!window.speechSynthesis.speaking) {
-        clearInterval(speechIntervalRef.current)
-      } else {
-        window.speechSynthesis.pause()
-        window.speechSynthesis.resume()
-      }
-    }, 10000)
+    utterance.onstart = () => setSpeakingIdx(idx)
+    utterance.onend = () => setSpeakingIdx(null)
+    utterance.onerror = () => setSpeakingIdx(null)
 
     window.speechSynthesis.speak(utterance)
   }
 
   const handleImageSelect = async (e) => {
     const file = e.target.files?.[0]
-    if (!file) return
-    if (!file.type.startsWith('image/')) {
-      alert('Formato no soportado. Cargue un archivo de imagen válido (JPG, PNG, WebP).')
-      return
-    }
+    if (!file || !file.type.startsWith('image/')) return
     try {
       const base64 = await compressImage(file)
       setSelectedImage(base64)
     } catch (err) {
-      alert('Error en la compresión del archivo visual.')
+      alert('Error al comprimir imagen.')
     } finally {
       e.target.value = ''
     }
@@ -430,12 +336,8 @@ function App() {
       if (items[i].type.indexOf('image') !== -1) {
         const file = items[i].getAsFile()
         if (file) {
-          try {
-            const base64 = await compressImage(file)
-            setSelectedImage(base64)
-          } catch (err) {
-            console.error('Error al decodificar imagen del portapapeles:', err)
-          }
+          const base64 = await compressImage(file)
+          setSelectedImage(base64)
         }
         break
       }
@@ -444,7 +346,6 @@ function App() {
 
   const handleSend = async (e) => {
     e.preventDefault()
-
     if (isListeningRef.current && recognitionRef.current) {
       recognitionRef.current.stop()
       setIsListening(false)
@@ -457,12 +358,11 @@ function App() {
     const currentImage = selectedImage
     const userMsg = {
       role: 'user',
-      content: userText || (currentImage ? 'Realice un análisis técnico estructurado de esta entrada visual.' : ''),
+      content: userText || 'Analice esta imagen.',
       ...(currentImage ? { image: currentImage } : {})
     }
 
     const updatedMessages = [...messages, userMsg]
-
     setMessages(updatedMessages)
     setInput('')
     setSelectedImage(null)
@@ -470,47 +370,42 @@ function App() {
 
     let currentTitle = sessions.find(s => s.id === currentSessionId)?.title || 'SESIÓN'
     if (currentTitle.startsWith('SESIÓN // ')) {
-      const titleCandidate = userText || 'ANÁLISIS_VISUAL'
-      currentTitle = titleCandidate.length > 25 ? titleCandidate.slice(0, 25).toUpperCase() + '...' : titleCandidate.toUpperCase()
+      currentTitle = (userText || 'ANALISIS').slice(0, 25).toUpperCase()
     }
 
     try {
       const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 
-      const hasImagesInConversation = updatedMessages.some(m => m.image)
-      let modelToUse = selectedModel
-      if (hasImagesInConversation && modelToUse === 'deepseek/deepseek-chat') {
-        modelToUse = 'google/gemini-2.5-flash'
+      // DETECCIÓN DE COMANDO PARA CREAR IMÁGENES
+      const isImageRequest = userText.toLowerCase().startsWith('crear imagen') || userText.toLowerCase().startsWith('genera una imagen') || userText.toLowerCase().startsWith('dibuja');
+
+      if (isImageRequest) {
+        // Usamos Pollinations AI (modelo gratuito directo sin consumo de tokens de API) para generar imágenes estables
+        const promptClean = encodeURIComponent(userText.replace(/crear imagen de|genera una imagen de|dibuja/gi, '').trim());
+        const generatedImageUrl = `https://pollinations.ai/p/${promptClean}?width=1024&height=1024&nologo=true`;
+
+        const botResponse = `Imagen generada correctamente según el parámetro:\n\n![${userText}](${generatedImageUrl})`;
+        const finalMessages = [...updatedMessages, { role: 'assistant', content: botResponse }];
+        setMessages(finalMessages);
+
+        const updatedSessions = sessions.map((s) =>
+          s.id === currentSessionId ? { ...s, title: currentTitle, messages: finalMessages } : s
+        );
+        saveToStorage(updatedSessions);
+        setLoading(false);
+        return;
       }
 
+      // PETICIÓN NORMAL CON DEEPSEEK
       const apiMessages = [
         {
           role: "system",
-          content: "Eres un sistema de inteligencia artificial avanzado y tecnológico. Responde de forma analítica, estructurada y técnica. No utilices emojis bajo ninguna circunstancia. Cuando proporciones código, formatéalo estrictamente dentro de bloques de código markdown con su respectivo lenguaje."
+          content: "Eres DeepSeek V3, un sistema de inteligencia artificial avanzado y técnico. Responde de forma analítica, estructurada y clara. No uses emojis."
         },
-        ...updatedMessages.map(msg => {
-          if (msg.role === 'user' && msg.image) {
-            return {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: msg.content || 'Analice y describa técnicamente esta imagen.'
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: msg.image
-                  }
-                }
-              ]
-            }
-          }
-          return {
-            role: msg.role === 'assistant' ? 'assistant' : 'user',
-            content: msg.content
-          }
-        })
+        ...updatedMessages.map(msg => ({
+          role: msg.role === 'assistant' ? 'assistant' : 'user',
+          content: msg.content
+        }))
       ]
 
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -518,13 +413,13 @@ function App() {
         headers: {
           "Authorization": `Bearer ${API_KEY}`,
           "HTTP-Referer": window.location.origin,
-          "X-Title": "Terminal IA Multimodal",
+          "X-Title": "Terminal IA",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: modelToUse,
+          model: 'deepseek/deepseek-chat',
           messages: apiMessages,
-          max_tokens: 4000 // <--- SE FIJA UN LÍMITE SEGURO PARA EVITAR EL ERROR DE CRÉDITOS Y TOKENS
+          max_tokens: 2000
         })
       })
 
@@ -535,24 +430,18 @@ function App() {
         const botResponse = data.choices[0].message.content
         finalMessages = [...updatedMessages, { role: 'assistant', content: botResponse }]
       } else {
-        const errorMsg = data.error?.message || "Verifique la clave de acceso de OpenRouter o disponibilidad del motor."
-        finalMessages = [...updatedMessages, { role: 'assistant', content: `[FALLO DE RESPUESTA]: ${errorMsg}` }]
+        const errorMsg = data.error?.message || "Error en el servidor de inferencia."
+        finalMessages = [...updatedMessages, { role: 'assistant', content: `[FALLO]: ${errorMsg}` }]
       }
 
       setMessages(finalMessages)
-
       const updatedSessions = sessions.map((s) =>
-        s.id === currentSessionId
-          ? { ...s, title: currentTitle, messages: finalMessages }
-          : s
+        s.id === currentSessionId ? { ...s, title: currentTitle, messages: finalMessages } : s
       )
       saveToStorage(updatedSessions)
 
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: '[ERROR DE RED]: No se pudo establecer comunicación con el servidor de inferencia.' }
-      ])
+      setMessages((prev) => [...prev, { role: 'assistant', content: '[ERROR DE RED]: No se pudo conectar con la API.' }])
     } finally {
       setLoading(false)
     }
@@ -560,11 +449,10 @@ function App() {
 
   return (
     <div className="layout-container">
-      {/* Panel Lateral Tecnologico */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <div className="brand-badge">NEXUS // CORE</div>
-          <div className="brand-sub">SISTEMA MULTIMODAL</div>
+          <div className="brand-badge">DEEPSEEK // CORE</div>
+          <div className="brand-sub">TERMINAL TÉCNICA</div>
         </div>
 
         <button className="new-chat-btn" onClick={createNewChat}>
@@ -586,34 +474,26 @@ function App() {
             >
               <span className="chat-icon"><IconTerminal /></span>
               <span className="chat-title">{s.title}</span>
-              <button className="delete-btn" onClick={(e) => deleteSession(e, s.id)} title="Eliminar registro">
+              <button className="delete-btn" onClick={(e) => deleteSession(e, s.id)} title="Eliminar">
                 <IconTrash />
               </button>
             </div>
           ))}
         </div>
-
-        <div className="sidebar-footer">
-          <span className="hud-metric">MEM: PERSISTENTE</span>
-          <span className="hud-metric">ESTADO: LISTO</span>
-        </div>
       </aside>
 
-      {/* Area Central de Interfaz */}
       <main className="chat-main">
         <header className="chat-header">
           <div className="header-info">
-            <div className="avatar">
-              <IconCpu />
-            </div>
+            <div className="avatar"><IconCpu /></div>
             <div>
               <div className="title-row">
-                <h2>NEXUS // ASISTENTE IA</h2>
-                <span className="version-tag">v4.2-NEURAL</span>
+                <h2>DEEPSEEK V3 // ASISTENTE</h2>
+                <span className="version-tag">v3.0-PRO</span>
               </div>
               <div className="status-online">
                 <span className="pulse-dot"></span>
-                <span>SISTEMA ONLINE // AUDIO + VISIÓN + MEMORIA</span>
+                <span>MOTOR ACTIVO // TEXTO + CÓDIGO + IMÁGENES</span>
               </div>
             </div>
           </div>
@@ -627,34 +507,18 @@ function App() {
                   value={selectedVoiceName}
                   onChange={(e) => setSelectedVoiceName(e.target.value)}
                   className="voice-select"
-                  title="Modulador de voz neuronal natural"
                 >
-                  {availableVoices.map((v) => {
-                    const cleanName = v.name
-                      .replace(/(Microsoft|Google)\s*/i, '')
-                      .replace(/Online\s*\(Natural\)\s*-\s*/i, '[NATURAL] ')
-                      .slice(0, 32)
-                    return (
-                      <option key={v.name} value={v.name}>
-                        {cleanName}
-                      </option>
-                    )
-                  })}
+                  {availableVoices.map((v) => (
+                    <option key={v.name} value={v.name}>{v.name.slice(0, 30)}</option>
+                  ))}
                 </select>
               </div>
             )}
 
             <div className="model-selector-container">
               <label htmlFor="model-select">MOTOR:</label>
-              <select
-                id="model-select"
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="model-select"
-              >
-                <option value="google/gemini-2.5-flash">GEMINI 2.5 FLASH [MULTIMODAL]</option>
-                <option value="openai/gpt-4o-mini">GPT-4O MINI [VISIÓN + TEXTO]</option>
-                <option value="deepseek/deepseek-chat">DEEPSEEK V3 [CÓDIGO + NLP]</option>
+              <select id="model-select" value={selectedModel} disabled className="model-select">
+                <option value="deepseek/deepseek-chat">DEEPSEEK V3 [ACTIVO]</option>
               </select>
             </div>
           </div>
@@ -666,14 +530,13 @@ function App() {
               <div className="message-bubble">
                 <div className="bubble-meta">
                   <span className="meta-role">
-                    {msg.role === 'user' ? 'OPERADOR // ENTRADA' : 'MOTOR_NEURAL // INFERENCIA'}
+                    {msg.role === 'user' ? 'OPERADOR // ENTRADA' : 'DEEPSEEK // RESPUESTA'}
                   </span>
                 </div>
 
                 {msg.image && (
                   <div className="bubble-image-container">
                     <img src={msg.image} alt="Entrada visual" className="bubble-image" />
-                    <div className="image-overlay-tag">ESPECTRO // IMAGEN PROCESADA</div>
                   </div>
                 )}
 
@@ -684,23 +547,9 @@ function App() {
                     type="button"
                     className={`speak-btn ${speakingIdx === idx ? 'speaking' : ''}`}
                     onClick={() => speakText(msg.content, idx)}
-                    title={speakingIdx === idx ? "Detener reproducción de audio" : "Sintetizar salida por audio"}
                   >
-                    {speakingIdx === idx ? (
-                      <>
-                        <span className="audio-bars">
-                          <span className="bar"></span>
-                          <span className="bar"></span>
-                          <span className="bar"></span>
-                        </span>
-                        <span>DETENER AUDIO</span>
-                      </>
-                    ) : (
-                      <>
-                        <IconSpeaker />
-                        <span>SINTETIZAR AUDIO</span>
-                      </>
-                    )}
+                    <IconSpeaker />
+                    <span>{speakingIdx === idx ? 'DETENER AUDIO' : 'SINTETIZAR AUDIO'}</span>
                   </button>
                 )}
               </div>
@@ -710,12 +559,10 @@ function App() {
           {loading && (
             <div className="message-row assistant">
               <div className="message-bubble loading-bubble">
-                <div className="bubble-meta">
-                  <span className="meta-role">MOTOR_NEURAL // PROCESAMIENTO</span>
-                </div>
+                <div className="bubble-meta"><span className="meta-role">PROCESANDO...</span></div>
                 <div className="tech-loading-container">
                   <span className="tech-loading-line"></span>
-                  <span className="tech-loading-text">CALCULANDO TENSORES DE INFERENCIA...</span>
+                  <span className="tech-loading-text">GENERANDO RESPUESTA O IMAGEN...</span>
                 </div>
               </div>
             </div>
@@ -726,19 +573,10 @@ function App() {
         {selectedImage && (
           <div className="image-preview-bar">
             <div className="image-preview-card">
-              <img src={selectedImage} alt="Previsualización" className="image-preview-img" />
-              <button
-                type="button"
-                className="image-preview-close"
-                onClick={() => setSelectedImage(null)}
-                title="Descartar entrada"
-              >
+              <img src={selectedImage} alt="Preview" className="image-preview-img" />
+              <button type="button" className="image-preview-close" onClick={() => setSelectedImage(null)}>
                 <IconClose />
               </button>
-            </div>
-            <div className="preview-meta-info">
-              <span className="image-preview-title">BUFFER VISUAL ACTIVADO</span>
-              <span className="image-preview-hint">Entrada lista para decodificación espectral y análisis neural</span>
             </div>
           </div>
         )}
@@ -755,7 +593,6 @@ function App() {
             type="button"
             className="attach-btn"
             onClick={() => fileInputRef.current?.click()}
-            title="Cargar archivo visual [JPG, PNG, WebP] or presione Ctrl+V"
             disabled={loading}
           >
             <IconCamera />
@@ -765,41 +602,22 @@ function App() {
             type="button"
             className={`mic-btn ${isListening ? 'listening' : ''}`}
             onClick={handleVoiceInput}
-            title={isListening ? "Detener captura de audio" : "Iniciar captura de voz"}
           >
-            {isListening ? (
-              <span className="audio-bars">
-                <span className="bar"></span>
-                <span className="bar"></span>
-                <span className="bar"></span>
-              </span>
-            ) : (
-              <IconMic />
-            )}
+            <IconMic />
           </button>
 
           <div className="input-field-wrapper">
             <span className="input-prompt-symbol">&gt;</span>
             <input
               type="text"
-              placeholder={
-                isListening
-                  ? "TRANSMISIÓN DE AUDIO ACTIVA... ESCUCHANDO..."
-                  : selectedImage
-                    ? "Ingrese parámetro de análisis o presione EJECUTAR..."
-                    : "Ingrese comando, consulta de código o pegue imagen [Ctrl+V]..."
-              }
+              placeholder="Escribe una consulta, código o 'crear imagen de [descripción]'..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
             />
           </div>
 
-          <button
-            type="submit"
-            className="submit-btn"
-            disabled={loading || (!input.trim() && !selectedImage)}
-          >
+          <button type="submit" className="submit-btn" disabled={loading || (!input.trim() && !selectedImage)}>
             <IconSend />
             <span>EJECUTAR</span>
           </button>
