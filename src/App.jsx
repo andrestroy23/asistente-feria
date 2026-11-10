@@ -149,7 +149,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
-  const [selectedModel, setSelectedModel] = useState('google/gemini-2.5-flash')
+  const [selectedModel, setSelectedModel] = useState('deepseek/deepseek-chat')
   const [availableVoices, setAvailableVoices] = useState([])
   const [selectedVoiceName, setSelectedVoiceName] = useState('')
   const [speakingIdx, setSpeakingIdx] = useState(null)
