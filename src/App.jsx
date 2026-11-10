@@ -375,9 +375,38 @@ function App() {
 
     try {
       const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+      // DETECCIÓN AMPLIADA DE COMANDOS PARA CREAR IMÁGENES
+      const textLower = userText.toLowerCase();
+      const isImageRequest =
+        textLower.includes('crear imagen') ||
+        textLower.includes('genera una imagen') ||
+        textLower.includes('generar una imagen') ||
+        textLower.includes('dibuja') ||
+        textLower.includes('crea una imagen') ||
+        textLower.includes('haz una imagen');
 
-      // DETECCIÓN DE COMANDO PARA CREAR IMÁGENES
-      const isImageRequest = userText.toLowerCase().startsWith('crear imagen') || userText.toLowerCase().startsWith('genera una imagen') || userText.toLowerCase().startsWith('dibuja');
+      if (isImageRequest) {
+        // Extraemos lo que quiere que dibuje limpiando el texto del comando
+        let promptClean = userText
+          .replace(/crear imagen de|genera una imagen de|generar una imagen de|dibuja un|dibuja una|dibuja|crea una imagen de|haz una imagen de/gi, '')
+          .trim();
+
+        if (!promptClean) promptClean = userText;
+
+        const encodedPrompt = encodeURIComponent(promptClean);
+        const generatedImageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true`;
+
+        const botResponse = `Imagen generada correctamente:\n\n![${userText}](${generatedImageUrl})`;
+        const finalMessages = [...updatedMessages, { role: 'assistant', content: botResponse }];
+        setMessages(finalMessages);
+
+        const updatedSessions = sessions.map((s) =>
+          s.id === currentSessionId ? { ...s, title: currentTitle, messages: finalMessages } : s
+        );
+        saveToStorage(updatedSessions);
+        setLoading(false);
+        return;
+      }
 
       if (isImageRequest) {
         // Usamos Pollinations AI (modelo gratuito directo sin consumo de tokens de API) para generar imágenes estables
