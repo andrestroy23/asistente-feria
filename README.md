@@ -27,19 +27,21 @@
 
 ## ✨ Características Principales
 
-- 🧠 **Inteligencia Artificial Avanzada**: Integrado con el modelo `deepseek/deepseek-chat` a través de OpenRouter, con respuestas especializadas en programación, estructuras de datos y soporte general.
-- 🎙️ **Reconocimiento de Voz (Speech-to-Text)**: Permite dictar consultas utilizando la Web Speech API de manera intuitiva y con animaciones de estado en tiempo real.
-- 💾 **Persistencia Local con IndexedDB**: Los chats y mensajes se guardan automáticamente en el navegador usando `idb-keyval`, asegurando que no se pierda el historial tras recargar la página.
+- 📷 **Análisis Visual de Fotos y Capturas**: Puedes adjuntar imágenes mediante el botón 📷 o pegarlas directamente con `Ctrl+V`. La IA analiza los detalles, resuelve dudas sobre fotos, diagramas, fórmulas o fragmentos de código en capturas de pantalla.
+- 🧠 **Modelos Multimodales e IA Avanzada**: Soporte para modelos de texto y visión de alto rendimiento como `google/gemini-2.5-flash`, `openai/gpt-4o-mini` y `deepseek/deepseek-chat` a través de OpenRouter con selector integrado.
+- 🎙️ **Reconocimiento de Voz Continuo**: Dictado por voz (Speech-to-Text) en tiempo real con Web Speech API sin cortes abruptos en pausas normales.
+- 🔊 **Síntesis de Voz (Text-to-Speech)**: Botón para escuchar las respuestas del asistente narradas con voz en español.
+- 💾 **Persistencia Local con IndexedDB**: Los chats, mensajes e imágenes se guardan automáticamente en el navegador usando `idb-keyval`, asegurando que no se pierda el historial tras recargar la página.
 - 🗂️ **Gestión Multi-Sesión**:
   - Creación de nuevos chats independientes.
   - Títulos automáticos generados a partir de la primera consulta.
   - Cambio fluido entre conversaciones en la barra lateral.
   - Eliminación individual de historiales.
-- 📝 **Soporte Markdown y Bloques de Código**: Renderizado con `react-markdown`, optimizado para mostrar fragmentos de código, listas y formato enriquecido.
+- 📝 **Soporte Markdown y Bloques de Código**: Renderizado con `react-markdown`, optimizado para mostrar fragmentos de código con sintaxis clara y formato enriquecido.
 - 🎨 **Interfaz de Usuario Moderna**:
   - Tema oscuro (*Dark Mode*) con estética profesional.
+  - Previsualización interactiva de imágenes antes de enviar.
   - Indicadores visuales de estado y burbujas de carga animadas.
-  - Scroll automático inteligente al último mensaje.
 
 ---
 
