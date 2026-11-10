@@ -369,14 +369,32 @@ body {
   justify-content: flex-start;
 }
 
-.message-bubble {
-  max-width: 80%;
-  padding: 14px 18px;
+.bubble-image,
+.message-bubble img {
+  max-width: 100%;
+  height: auto;
   border-radius: 8px;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  position: relative;
-  letter-spacing: 0.02em;
+  display: block;
+  object-fit: contain;
+}
+
+.message-bubble pre {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.message-bubble code {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.message-bubble {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
 .bubble-meta {
