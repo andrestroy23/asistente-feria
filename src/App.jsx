@@ -3,7 +3,83 @@ import ReactMarkdown from 'react-markdown'
 import { get, set } from 'idb-keyval'
 import './App.css'
 
-// Redimensiona y comprime imágenes para optimizar el almacenamiento en IndexedDB y la API
+// Iconos vectoriales de precisión tecnica (sin uso de emojis)
+const IconPlus = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+)
+
+const IconTrash = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+)
+
+const IconTerminal = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="4 17 10 11 4 5"></polyline>
+    <line x1="12" y1="19" x2="20" y2="19"></line>
+  </svg>
+)
+
+const IconCpu = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+    <rect x="9" y="9" width="6" height="6"></rect>
+    <line x1="9" y1="1" x2="9" y2="4"></line>
+    <line x1="15" y1="1" x2="15" y2="4"></line>
+    <line x1="9" y1="20" x2="9" y2="23"></line>
+    <line x1="15" y1="20" x2="15" y2="23"></line>
+    <line x1="20" y1="9" x2="23" y2="9"></line>
+    <line x1="20" y1="14" x2="23" y2="14"></line>
+    <line x1="1" y1="9" x2="4" y2="9"></line>
+    <line x1="1" y1="14" x2="4" y2="14"></line>
+  </svg>
+)
+
+const IconCamera = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+    <circle cx="12" cy="13" r="4"></circle>
+  </svg>
+)
+
+const IconMic = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+    <line x1="12" y1="19" x2="12" y2="23"></line>
+    <line x1="8" y1="23" x2="16" y2="23"></line>
+  </svg>
+)
+
+const IconSend = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="22" y1="2" x2="11" y2="13"></line>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+  </svg>
+)
+
+const IconSpeaker = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+  </svg>
+)
+
+const IconClose = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+)
+
+// Optimizador y compresor de matrices de imagen para almacenamiento y transmision
 const compressImage = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -36,12 +112,34 @@ const compressImage = (file) => {
         const compressed = canvas.toDataURL('image/jpeg', 0.8)
         resolve(compressed)
       }
-      img.onerror = () => reject(new Error('No se pudo procesar la imagen'))
+      img.onerror = () => reject(new Error('Fallo en decodificacion de matriz visual'))
       img.src = e.target.result
     }
-    reader.onerror = () => reject(new Error('Error al leer el archivo'))
+    reader.onerror = () => reject(new Error('Fallo en lectura de archivo binario'))
     reader.readAsDataURL(file)
   })
+}
+
+// Limpieza y adaptacion fonetica del texto Markdown para sintesis de voz natural y fluida
+const cleanTextForSpeech = (markdownText) => {
+  if (!markdownText) return ''
+  let text = markdownText
+
+  // Omitir bloques de codigo para evitar lectura robotica de sintaxis
+  text = text.replace(/```[\s\S]*?```/g, '. Código detallado en pantalla. ')
+  text = text.replace(/`([^`]+)`/g, '$1')
+  text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+  text = text.replace(/^#{1,6}\s+/gm, '')
+  text = text.replace(/(\*\*|__)(.*?)\1/g, '$2')
+  text = text.replace(/(\*|_)(.*?)\1/g, '$2')
+  text = text.replace(/^>\s+/gm, '')
+  text = text.replace(/^[\*\-\+]\s+/gm, '')
+  text = text.replace(/^\d+\.\s+/gm, '')
+  text = text.replace(/(\/\/|::)/g, ', ')
+  text = text.replace(/[\[\]{}]/g, '')
+  text = text.replace(/\s+/g, ' ').trim()
+
+  return text
 }
 
 function App() {
@@ -53,13 +151,51 @@ function App() {
   const [isListening, setIsListening] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
   const [selectedModel, setSelectedModel] = useState('google/gemini-2.5-flash')
+  const [availableVoices, setAvailableVoices] = useState([])
+  const [selectedVoiceName, setSelectedVoiceName] = useState('')
+  const [speakingIdx, setSpeakingIdx] = useState(null)
+  const speechIntervalRef = useRef(null)
   const fileInputRef = useRef(null)
   const chatEndRef = useRef(null)
   const recognitionRef = useRef(null)
   const isListeningRef = useRef(false)
   const baseInputRef = useRef('')
 
-  // Limpieza al desmontar el componente
+  // Deteccion y carga de moduladores de voz naturales en espanol
+  useEffect(() => {
+    const loadVoices = () => {
+      if (!window.speechSynthesis) return
+      const allVoices = window.speechSynthesis.getVoices()
+      const spanishVoices = allVoices.filter(v => v.lang.toLowerCase().startsWith('es'))
+      setAvailableVoices(spanishVoices)
+
+      if (spanishVoices.length > 0 && !selectedVoiceName) {
+        // Priorizar voces neuronales "Natural" de alta definicion (Edge/Azure o Chrome)
+        const naturalVoice = 
+          spanishVoices.find(v => v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online (Natural)')) ||
+          spanishVoices.find(v => v.name.toLowerCase().includes('google')) ||
+          spanishVoices.find(v => v.name.toLowerCase().includes('microsoft')) ||
+          spanishVoices[0]
+
+        if (naturalVoice) {
+          setSelectedVoiceName(naturalVoice.name)
+        }
+      }
+    }
+
+    loadVoices()
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = loadVoices
+    }
+
+    return () => {
+      if (speechIntervalRef.current) {
+        clearInterval(speechIntervalRef.current)
+      }
+    }
+  }, [selectedVoiceName])
+
+  // Limpieza de procesos y audio al desmontar
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -71,7 +207,7 @@ function App() {
     }
   }, [])
 
-  // 1. Cargar el historial completo desde la Base de Datos al iniciar
+  // Inicializacion del almacen persistente (IndexedDB)
   useEffect(() => {
     const loadDB = async () => {
       const savedSessions = await get('ai_chat_sessions')
@@ -86,29 +222,29 @@ function App() {
     loadDB()
   }, [])
 
-  // Auto scroll hacia el último mensaje
+  // Desplazamiento automatico hacia el ultimo registro
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  // Guardar en IndexedDB cada vez que cambian los mensajes
+  // Sincronizacion de sesiones con base de datos local
   const saveToStorage = async (updatedSessions) => {
     setSessions(updatedSessions)
     await set('ai_chat_sessions', updatedSessions)
   }
 
-  // Crear una nueva sesión de chat
+  // Creacion de un nuevo registro de sesion
   const createNewChat = () => {
     const newId = Date.now().toString()
     const initialMsg = [
       {
         role: 'assistant',
-        content: '¡Hola! 🤖 Soy tu Asistente Virtual IA. Tengo memoria en base de datos local, soporte de voz y análisis visual de fotos 📷. ¿En qué te ayudo?'
+        content: 'SISTEMA INICIALIZADO // Núcleo de asistencia cognitiva activo.\n\nCapacidades del entorno:\n- Inferencia neural multimodal (texto, código y análisis de imágenes).\n- Entrada de audio continua y síntesis de voz en español.\n- Persistencia de datos en almacenamiento local (IndexedDB).\n\nIngrese un comando, consulta o cargue un archivo visual para comenzar.'
       }
     ]
     const newSession = {
       id: newId,
-      title: 'Nuevo Chat',
+      title: 'SESIÓN // ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       messages: initialMsg
     }
     const updated = [newSession, ...sessions]
@@ -117,7 +253,7 @@ function App() {
     saveToStorage(updated)
   }
 
-  // Cambiar entre chats guardados
+  // Cambio de contexto de sesion
   const selectSession = (id) => {
     const found = sessions.find((s) => s.id === id)
     if (found) {
@@ -126,7 +262,7 @@ function App() {
     }
   }
 
-  // Eliminar un chat de la base de datos
+  // Eliminacion de registros en base de datos
   const deleteSession = (e, id) => {
     e.stopPropagation()
     const updated = sessions.filter((s) => s.id !== id)
@@ -141,15 +277,14 @@ function App() {
     }
   }
 
-  // Reconocimiento de voz continuo (Speech-to-Text)
+  // Captura de flujo de audio por transductor (Speech-to-Text)
   const handleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
-      alert("Tu navegador no soporta reconocimiento de voz. Usa Google Chrome o Microsoft Edge.")
+      alert("Navegador incompatible con el transductor de voz. Utilice Google Chrome o Microsoft Edge.")
       return
     }
 
-    // Si ya está escuchando, detener al pulsar de nuevo
     if (isListeningRef.current) {
       if (recognitionRef.current) {
         recognitionRef.current.stop()
@@ -160,17 +295,15 @@ function App() {
     }
 
     try {
-      // Abortar cualquier instancia previa residual
       if (recognitionRef.current) {
         recognitionRef.current.abort()
       }
 
       const recognition = new SpeechRecognition()
       recognition.lang = 'es-ES'
-      recognition.continuous = true // Mantiene el micrófono abierto sin cortarse en pausas breves
-      recognition.interimResults = true // Muestra la transcripción en tiempo real
+      recognition.continuous = true
+      recognition.interimResults = true
 
-      // Conservar el texto previo si ya se había escrito algo
       baseInputRef.current = input ? input.trim() + ' ' : ''
 
       recognition.onstart = () => {
@@ -187,17 +320,16 @@ function App() {
       }
 
       recognition.onerror = (event) => {
-        console.warn("Speech recognition error:", event.error)
+        console.warn("Error en transductor de audio:", event.error)
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-          alert("Permiso de micrófono denegado. Por favor, concede acceso al micrófono en los permisos de tu navegador.")
+          alert("Acceso al micrófono denegado en la configuración del navegador.")
           setIsListening(false)
           isListeningRef.current = false
         } else if (event.error === 'audio-capture') {
-          alert("No se detectó ningún micrófono conectado en tu equipo.")
+          alert("Dispositivo de entrada de audio no detectado en el hardware.")
           setIsListening(false)
           isListeningRef.current = false
         } else if (event.error !== 'no-speech') {
-          // Ignorar silencios momentáneos para que no se apague
           setIsListening(false)
           isListeningRef.current = false
         }
@@ -211,45 +343,103 @@ function App() {
       recognitionRef.current = recognition
       recognition.start()
     } catch (err) {
-      console.error("Error al iniciar reconocimiento:", err)
+      console.error("Fallo al inicializar transductor:", err)
       setIsListening(false)
       isListeningRef.current = false
     }
   }
 
-  // Reproducir respuesta por voz (Text-to-Speech)
-  const speakText = (text) => {
+  // Sintesis de voz con modulador neuronal natural (Text-to-Speech)
+  const speakText = (text, idx) => {
     if (!window.speechSynthesis) return
-    if (window.speechSynthesis.speaking) {
+
+    if (speechIntervalRef.current) {
+      clearInterval(speechIntervalRef.current)
+      speechIntervalRef.current = null
+    }
+
+    // Si ya esta en ejecucion este mismo mensaje, detenerlo
+    if (speakingIdx === idx && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel()
+      setSpeakingIdx(null)
       return
     }
-    const cleanText = text.replace(/[`*#_>\[\]]/g, '')
-    const utterance = new SpeechSynthesisUtterance(cleanText)
+
+    window.speechSynthesis.cancel()
+
+    const naturalSpeech = cleanTextForSpeech(text)
+    if (!naturalSpeech) return
+
+    const utterance = new SpeechSynthesisUtterance(naturalSpeech)
     utterance.lang = 'es-ES'
-    utterance.rate = 1.0
+    utterance.rate = 0.98 // Cadencia natural y pausada
+    utterance.pitch = 1.0
+
+    // Asignar el modulador de voz seleccionado
+    if (selectedVoiceName && availableVoices.length > 0) {
+      const voiceObj = availableVoices.find(v => v.name === selectedVoiceName)
+      if (voiceObj) {
+        utterance.voice = voiceObj
+        utterance.lang = voiceObj.lang
+      }
+    } else if (availableVoices.length > 0) {
+      const best = availableVoices.find(v => v.name.includes('Natural') || v.name.includes('Neural')) || availableVoices[0]
+      if (best) {
+        utterance.voice = best
+        utterance.lang = best.lang
+      }
+    }
+
+    utterance.onstart = () => {
+      setSpeakingIdx(idx)
+    }
+
+    utterance.onend = () => {
+      if (speechIntervalRef.current) {
+        clearInterval(speechIntervalRef.current)
+      }
+      setSpeakingIdx(null)
+    }
+
+    utterance.onerror = () => {
+      if (speechIntervalRef.current) {
+        clearInterval(speechIntervalRef.current)
+      }
+      setSpeakingIdx(null)
+    }
+
+    // Anti-congelamiento en navegadores basados en Chromium para textos extensos
+    speechIntervalRef.current = setInterval(() => {
+      if (!window.speechSynthesis.speaking) {
+        clearInterval(speechIntervalRef.current)
+      } else {
+        window.speechSynthesis.pause()
+        window.speechSynthesis.resume()
+      }
+    }, 10000)
+
     window.speechSynthesis.speak(utterance)
   }
 
-  // Manejador para adjuntar imagen desde archivo
+  // Carga de archivo visual
   const handleImageSelect = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      alert('Por favor selecciona un archivo de imagen válido (JPG, PNG, WebP, etc.).')
+      alert('Formato no soportado. Cargue un archivo de imagen válido (JPG, PNG, WebP).')
       return
     }
     try {
       const base64 = await compressImage(file)
       setSelectedImage(base64)
     } catch (err) {
-      alert('Error al procesar la imagen seleccionada.')
+      alert('Error en la compresión del archivo visual.')
     } finally {
       e.target.value = ''
     }
   }
 
-  // Manejador para pegar imagen desde el portapapeles (Ctrl+V)
+  // Captura de imagen desde portapapeles (Ctrl+V)
   const handlePaste = async (e) => {
     const items = e.clipboardData?.items
     if (!items) return
@@ -261,7 +451,7 @@ function App() {
             const base64 = await compressImage(file)
             setSelectedImage(base64)
           } catch (err) {
-            console.error('Error al pegar la imagen:', err)
+            console.error('Error al decodificar imagen del portapapeles:', err)
           }
         }
         break
@@ -269,11 +459,10 @@ function App() {
     }
   }
 
-  // Envío de mensajes y actualización de la BD
+  // Transmision de paquetes de datos e inferencia
   const handleSend = async (e) => {
     e.preventDefault()
 
-    // Si el micrófono seguía encendido, detenerlo limpiamente al enviar
     if (isListeningRef.current && recognitionRef.current) {
       recognitionRef.current.stop()
       setIsListening(false)
@@ -286,7 +475,7 @@ function App() {
     const currentImage = selectedImage
     const userMsg = {
       role: 'user',
-      content: userText || (currentImage ? 'Analiza esta imagen con detalle y explica qué contiene.' : ''),
+      content: userText || (currentImage ? 'Realice un análisis técnico estructurado de esta entrada visual.' : ''),
       ...(currentImage ? { image: currentImage } : {})
     }
 
@@ -297,22 +486,16 @@ function App() {
     setSelectedImage(null)
     setLoading(true)
 
-    // Actualizar título en el historial si es la primera pregunta
-    let currentTitle = sessions.find(s => s.id === currentSessionId)?.title || 'Chat'
-    if (currentTitle === 'Nuevo Chat') {
-      const titleCandidate = userText || 'Análisis de imagen'
-      currentTitle = titleCandidate.length > 25 ? titleCandidate.slice(0, 25) + '...' : titleCandidate
+    let currentTitle = sessions.find(s => s.id === currentSessionId)?.title || 'SESIÓN'
+    if (currentTitle.startsWith('SESIÓN // ')) {
+      const titleCandidate = userText || 'ANÁLISIS_VISUAL'
+      currentTitle = titleCandidate.length > 25 ? titleCandidate.slice(0, 25).toUpperCase() + '...' : titleCandidate.toUpperCase()
     }
 
     try {
-      // 🔑 Tu API Key de OpenRouter (empieza con sk-or-v1-...)
       const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 
-      console.log("Valor de la API Key:", API_KEY ? "¡Cargada correctamente!" : "¡ESTÁ VACÍA O INDEFINIDA!");
-
       const hasImagesInConversation = updatedMessages.some(m => m.image)
-
-      // Si hay imágenes en el chat y el modelo seleccionado no tiene visión, usar Gemini 2.5 Flash
       let modelToUse = selectedModel
       if (hasImagesInConversation && modelToUse === 'deepseek/deepseek-chat') {
         modelToUse = 'google/gemini-2.5-flash'
@@ -321,7 +504,7 @@ function App() {
       const apiMessages = [
         {
           role: "system",
-          content: "Eres un asistente de IA útil, experto en análisis visual, programación y resolución de dudas. Si el usuario adjunta una imagen, obsérvala con atención, analiza sus detalles visuales y responde con precisión a sus preguntas. Formatea el código claramente en bloques de código."
+          content: "Eres un sistema de inteligencia artificial avanzado y tecnológico. Responde de forma analítica, estructurada y técnica. No utilices emojis bajo ninguna circunstancia. Cuando proporciones código, formatéalo estrictamente dentro de bloques de código markdown con su respectivo lenguaje."
         },
         ...updatedMessages.map(msg => {
           if (msg.role === 'user' && msg.image) {
@@ -330,7 +513,7 @@ function App() {
               content: [
                 {
                   type: 'text',
-                  text: msg.content || 'Analiza esta imagen con detalle.'
+                  text: msg.content || 'Analice y describa técnicamente esta imagen.'
                 },
                 {
                   type: 'image_url',
@@ -353,7 +536,7 @@ function App() {
         headers: {
           "Authorization": `Bearer ${API_KEY}`,
           "HTTP-Referer": window.location.origin,
-          "X-Title": "Asistente Virtual React",
+          "X-Title": "Terminal IA Multimodal",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -369,13 +552,12 @@ function App() {
         const botResponse = data.choices[0].message.content
         finalMessages = [...updatedMessages, { role: 'assistant', content: botResponse }]
       } else {
-        const errorMsg = data.error?.message || "Revisa tu API Key de OpenRouter o el modelo seleccionado."
-        finalMessages = [...updatedMessages, { role: 'assistant', content: `❌ Error de API: ${errorMsg}` }]
+        const errorMsg = data.error?.message || "Verifique la clave de acceso de OpenRouter o disponibilidad del motor."
+        finalMessages = [...updatedMessages, { role: 'assistant', content: `[FALLO DE RESPUESTA]: ${errorMsg}` }]
       }
 
       setMessages(finalMessages)
 
-      // Guardar sesión actualizada en IndexedDB
       const updatedSessions = sessions.map((s) =>
         s.id === currentSessionId
           ? { ...s, title: currentTitle, messages: finalMessages }
@@ -386,7 +568,7 @@ function App() {
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: '❌ Error de red al consultar la IA.' }
+        { role: 'assistant', content: '[ERROR DE RED]: No se pudo establecer comunicación con el servidor de inferencia.' }
       ])
     } finally {
       setLoading(false)
@@ -395,51 +577,103 @@ function App() {
 
   return (
     <div className="layout-container">
-      {/* Panel Lateral (Sidebar con Base de Datos) */}
+      {/* Panel Lateral Tecnologico */}
       <aside className="sidebar">
+        <div className="sidebar-brand">
+          <div className="brand-badge">NEXUS // CORE</div>
+          <div className="brand-sub">SISTEMA MULTIMODAL</div>
+        </div>
+
         <button className="new-chat-btn" onClick={createNewChat}>
-          ➕ Nuevo Chat
+          <IconPlus />
+          <span>NUEVA SESIÓN</span>
         </button>
+
         <div className="history-list">
-          <span className="history-label">Historial Guardado</span>
+          <div className="history-header">
+            <span className="history-label">REGISTROS // LOCAL_DB</span>
+            <span className="history-count">[{sessions.length}]</span>
+          </div>
+
           {sessions.map((s) => (
             <div
               key={s.id}
               className={`history-item ${s.id === currentSessionId ? 'active' : ''}`}
               onClick={() => selectSession(s.id)}
             >
-              <span className="chat-icon">💬</span>
+              <span className="chat-icon"><IconTerminal /></span>
               <span className="chat-title">{s.title}</span>
-              <button className="delete-btn" onClick={(e) => deleteSession(e, s.id)} title="Eliminar chat">
-                🗑️
+              <button className="delete-btn" onClick={(e) => deleteSession(e, s.id)} title="Eliminar registro">
+                <IconTrash />
               </button>
             </div>
           ))}
         </div>
+
+        <div className="sidebar-footer">
+          <span className="hud-metric">MEM: PERSISTENTE</span>
+          <span className="hud-metric">ESTADO: LISTO</span>
+        </div>
       </aside>
 
-      {/* Árbol Principal del Chat */}
+      {/* Area Central de Interfaz */}
       <main className="chat-main">
         <header className="chat-header">
           <div className="header-info">
-            <span className="avatar">🤖</span>
+            <div className="avatar">
+              <IconCpu />
+            </div>
             <div>
-              <h2>Asistente Virtual IA</h2>
-              <span className="status-online">● En línea (Memoria + Voz + Visión 📷)</span>
+              <div className="title-row">
+                <h2>NEXUS // ASISTENTE IA</h2>
+                <span className="version-tag">v4.2-NEURAL</span>
+              </div>
+              <div className="status-online">
+                <span className="pulse-dot"></span>
+                <span>SISTEMA ONLINE // AUDIO + VISIÓN + MEMORIA</span>
+              </div>
             </div>
           </div>
-          <div className="model-selector-container">
-            <label htmlFor="model-select">Modelo:</label>
-            <select
-              id="model-select"
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              className="model-select"
-            >
-              <option value="google/gemini-2.5-flash">⚡ Gemini 2.5 Flash (Visión + Texto)</option>
-              <option value="openai/gpt-4o-mini">🤖 GPT-4o Mini (Visión + Texto)</option>
-              <option value="deepseek/deepseek-chat">🧠 DeepSeek Chat (Texto / Código)</option>
-            </select>
+
+          <div className="header-controls">
+            {availableVoices.length > 0 && (
+              <div className="voice-selector-container">
+                <label htmlFor="voice-select">VOZ:</label>
+                <select
+                  id="voice-select"
+                  value={selectedVoiceName}
+                  onChange={(e) => setSelectedVoiceName(e.target.value)}
+                  className="voice-select"
+                  title="Modulador de voz neuronal natural"
+                >
+                  {availableVoices.map((v) => {
+                    const cleanName = v.name
+                      .replace(/(Microsoft|Google)\s*/i, '')
+                      .replace(/Online\s*\(Natural\)\s*-\s*/i, '[NATURAL] ')
+                      .slice(0, 32)
+                    return (
+                      <option key={v.name} value={v.name}>
+                        {cleanName}
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+            )}
+
+            <div className="model-selector-container">
+              <label htmlFor="model-select">MOTOR:</label>
+              <select
+                id="model-select"
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="model-select"
+              >
+                <option value="google/gemini-2.5-flash">GEMINI 2.5 FLASH [MULTIMODAL]</option>
+                <option value="openai/gpt-4o-mini">GPT-4O MINI [VISIÓN + TEXTO]</option>
+                <option value="deepseek/deepseek-chat">DEEPSEEK V3 [CÓDIGO + NLP]</option>
+              </select>
+            </div>
           </div>
         </header>
 
@@ -447,20 +681,43 @@ function App() {
           {messages.map((msg, idx) => (
             <div key={idx} className={`message-row ${msg.role}`}>
               <div className="message-bubble">
+                <div className="bubble-meta">
+                  <span className="meta-role">
+                    {msg.role === 'user' ? 'OPERADOR // ENTRADA' : 'MOTOR_NEURAL // INFERENCIA'}
+                  </span>
+                </div>
+
                 {msg.image && (
                   <div className="bubble-image-container">
-                    <img src={msg.image} alt="Adjunto" className="bubble-image" />
+                    <img src={msg.image} alt="Entrada visual" className="bubble-image" />
+                    <div className="image-overlay-tag">ESPECTRO // IMAGEN PROCESADA</div>
                   </div>
                 )}
+
                 {msg.content && <ReactMarkdown>{msg.content}</ReactMarkdown>}
+
                 {msg.role === 'assistant' && (
                   <button
                     type="button"
-                    className="speak-btn"
-                    onClick={() => speakText(msg.content)}
-                    title="Escuchar respuesta con voz"
+                    className={`speak-btn ${speakingIdx === idx ? 'speaking' : ''}`}
+                    onClick={() => speakText(msg.content, idx)}
+                    title={speakingIdx === idx ? "Detener reproducción de audio" : "Sintetizar salida por audio"}
                   >
-                    🔊 Escuchar
+                    {speakingIdx === idx ? (
+                      <>
+                        <span className="audio-bars">
+                          <span className="bar"></span>
+                          <span className="bar"></span>
+                          <span className="bar"></span>
+                        </span>
+                        <span>DETENER AUDIO</span>
+                      </>
+                    ) : (
+                      <>
+                        <IconSpeaker />
+                        <span>SINTETIZAR AUDIO</span>
+                      </>
+                    )}
                   </button>
                 )}
               </div>
@@ -470,16 +727,20 @@ function App() {
           {loading && (
             <div className="message-row assistant">
               <div className="message-bubble loading-bubble">
-                <span className="dot"></span>
-                <span className="dot"></span>
-                <span className="dot"></span>
+                <div className="bubble-meta">
+                  <span className="meta-role">MOTOR_NEURAL // PROCESAMIENTO</span>
+                </div>
+                <div className="tech-loading-container">
+                  <span className="tech-loading-line"></span>
+                  <span className="tech-loading-text">CALCULANDO TENSORES DE INFERENCIA...</span>
+                </div>
               </div>
             </div>
           )}
           <div ref={chatEndRef} />
         </div>
 
-        {/* Previsualización de imagen adjunta antes de enviar */}
+        {/* Previsualizacion de entrada visual antes de transmitir */}
         {selectedImage && (
           <div className="image-preview-bar">
             <div className="image-preview-card">
@@ -488,12 +749,15 @@ function App() {
                 type="button"
                 className="image-preview-close"
                 onClick={() => setSelectedImage(null)}
-                title="Quitar imagen"
+                title="Descartar entrada"
               >
-                ✕
+                <IconClose />
               </button>
             </div>
-            <span className="image-preview-hint">📷 Imagen lista para analizar con IA</span>
+            <div className="preview-meta-info">
+              <span className="image-preview-title">BUFFER VISUAL ACTIVADO</span>
+              <span className="image-preview-hint">Entrada lista para decodificación espectral y análisis neural</span>
+            </div>
           </div>
         )}
 
@@ -509,34 +773,53 @@ function App() {
             type="button"
             className="attach-btn"
             onClick={() => fileInputRef.current?.click()}
-            title="Subir o adjuntar foto (o pega con Ctrl+V)"
+            title="Cargar archivo visual [JPG, PNG, WebP] o presione Ctrl+V"
             disabled={loading}
           >
-            📷
+            <IconCamera />
           </button>
+
           <button
             type="button"
             className={`mic-btn ${isListening ? 'listening' : ''}`}
             onClick={handleVoiceInput}
-            title={isListening ? "Detener micrófono" : "Hablar por micrófono"}
+            title={isListening ? "Detener captura de audio" : "Iniciar captura de voz"}
           >
-            {isListening ? '🔴' : '🎤'}
+            {isListening ? (
+              <span className="audio-bars">
+                <span className="bar"></span>
+                <span className="bar"></span>
+                <span className="bar"></span>
+              </span>
+            ) : (
+              <IconMic />
+            )}
           </button>
-          <input
-            type="text"
-            placeholder={
-              isListening
-                ? "🎙️ Escuchando... habla ahora..."
-                : selectedImage
-                ? "Escribe una pregunta sobre la foto o pulsa Enviar..."
-                : "Escribe tu mensaje, pregunta o pega una imagen (Ctrl+V)..."
-            }
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={loading}
-          />
-          <button type="submit" disabled={loading || (!input.trim() && !selectedImage)}>
-            Enviar
+
+          <div className="input-field-wrapper">
+            <span className="input-prompt-symbol">&gt;</span>
+            <input
+              type="text"
+              placeholder={
+                isListening
+                  ? "TRANSMISIÓN DE AUDIO ACTIVA... ESCUCHANDO..."
+                  : selectedImage
+                  ? "Ingrese parámetro de análisis o presione EJECUTAR..."
+                  : "Ingrese comando, consulta de código o pegue imagen [Ctrl+V]..."
+              }
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={loading || (!input.trim() && !selectedImage)}
+          >
+            <IconSend />
+            <span>EJECUTAR</span>
           </button>
         </form>
       </main>
