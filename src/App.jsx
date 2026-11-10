@@ -125,7 +125,6 @@ const cleanTextForSpeech = (markdownText) => {
   if (!markdownText) return ''
   let text = markdownText
 
-  // Omitir bloques de codigo para evitar lectura robotica de sintaxis
   text = text.replace(/```[\s\S]*?```/g, '. Código detallado en pantalla. ')
   text = text.replace(/`([^`]+)`/g, '$1')
   text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
@@ -161,7 +160,6 @@ function App() {
   const isListeningRef = useRef(false)
   const baseInputRef = useRef('')
 
-  // Deteccion y carga de moduladores de voz naturales en espanol
   useEffect(() => {
     const loadVoices = () => {
       if (!window.speechSynthesis) return
@@ -170,8 +168,7 @@ function App() {
       setAvailableVoices(spanishVoices)
 
       if (spanishVoices.length > 0 && !selectedVoiceName) {
-        // Priorizar voces neuronales "Natural" de alta definicion (Edge/Azure o Chrome)
-        const naturalVoice = 
+        const naturalVoice =
           spanishVoices.find(v => v.name.includes('Natural') || v.name.includes('Neural') || v.name.includes('Online (Natural)')) ||
           spanishVoices.find(v => v.name.toLowerCase().includes('google')) ||
           spanishVoices.find(v => v.name.toLowerCase().includes('microsoft')) ||
@@ -195,7 +192,6 @@ function App() {
     }
   }, [selectedVoiceName])
 
-  // Limpieza de procesos y audio al desmontar
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -207,7 +203,6 @@ function App() {
     }
   }, [])
 
-  // Inicializacion del almacen persistente (IndexedDB)
   useEffect(() => {
     const loadDB = async () => {
       const savedSessions = await get('ai_chat_sessions')
@@ -222,24 +217,21 @@ function App() {
     loadDB()
   }, [])
 
-  // Desplazamiento automatico hacia el ultimo registro
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  // Sincronizacion de sesiones con base de datos local
   const saveToStorage = async (updatedSessions) => {
     setSessions(updatedSessions)
     await set('ai_chat_sessions', updatedSessions)
   }
 
-  // Creacion de un nuevo registro de sesion
   const createNewChat = () => {
     const newId = Date.now().toString()
     const initialMsg = [
       {
         role: 'assistant',
-        content: 'SISTEMA INICIALIZADO // Núcleo de asistencia cognitiva activo.\n\nCapacidades del entorno:\n- Inferencia neural multimodal (texto, código y análisis de imágenes).\n- Entrada de audio continua y síntesis de voz en español.\n- Persistencia de datos en almacenamiento local (IndexedDB).\n\nIngrese un comando, consulta o cargue un archivo visual para comenzar.'
+        content: 'SISTEMA INICIALIZADO // Núcleo de asistencia cognitiva activo.\n\nCapacidades del entorno:\nInferencia neural multimodal (texto, código y análisis de imágenes).\nEntrada de audio continua y síntesis de voz en español.\nPersistencia de datos en almacenamiento local (IndexedDB).\n\nIngrese un comando, consulta o cargue un archivo visual para comenzar.'
       }
     ]
     const newSession = {
@@ -253,7 +245,6 @@ function App() {
     saveToStorage(updated)
   }
 
-  // Cambio de contexto de sesion
   const selectSession = (id) => {
     const found = sessions.find((s) => s.id === id)
     if (found) {
@@ -262,7 +253,6 @@ function App() {
     }
   }
 
-  // Eliminacion de registros en base de datos
   const deleteSession = (e, id) => {
     e.stopPropagation()
     const updated = sessions.filter((s) => s.id !== id)
@@ -277,7 +267,6 @@ function App() {
     }
   }
 
-  // Captura de flujo de audio por transductor (Speech-to-Text)
   const handleVoiceInput = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
@@ -349,7 +338,6 @@ function App() {
     }
   }
 
-  // Sintesis de voz con modulador neuronal natural (Text-to-Speech)
   const speakText = (text, idx) => {
     if (!window.speechSynthesis) return
 
@@ -358,7 +346,6 @@ function App() {
       speechIntervalRef.current = null
     }
 
-    // Si ya esta en ejecucion este mismo mensaje, detenerlo
     if (speakingIdx === idx && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel()
       setSpeakingIdx(null)
@@ -372,10 +359,9 @@ function App() {
 
     const utterance = new SpeechSynthesisUtterance(naturalSpeech)
     utterance.lang = 'es-ES'
-    utterance.rate = 0.98 // Cadencia natural y pausada
+    utterance.rate = 0.98
     utterance.pitch = 1.0
 
-    // Asignar el modulador de voz seleccionado
     if (selectedVoiceName && availableVoices.length > 0) {
       const voiceObj = availableVoices.find(v => v.name === selectedVoiceName)
       if (voiceObj) {
@@ -408,7 +394,6 @@ function App() {
       setSpeakingIdx(null)
     }
 
-    // Anti-congelamiento en navegadores basados en Chromium para textos extensos
     speechIntervalRef.current = setInterval(() => {
       if (!window.speechSynthesis.speaking) {
         clearInterval(speechIntervalRef.current)
@@ -421,7 +406,6 @@ function App() {
     window.speechSynthesis.speak(utterance)
   }
 
-  // Carga de archivo visual
   const handleImageSelect = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -439,7 +423,6 @@ function App() {
     }
   }
 
-  // Captura de imagen desde portapapeles (Ctrl+V)
   const handlePaste = async (e) => {
     const items = e.clipboardData?.items
     if (!items) return
@@ -459,7 +442,6 @@ function App() {
     }
   }
 
-  // Transmision de paquetes de datos e inferencia
   const handleSend = async (e) => {
     e.preventDefault()
 
@@ -541,7 +523,8 @@ function App() {
         },
         body: JSON.stringify({
           model: modelToUse,
-          messages: apiMessages
+          messages: apiMessages,
+          max_tokens: 4000 // <--- SE FIJA UN LÍMITE SEGURO PARA EVITAR EL ERROR DE CRÉDITOS Y TOKENS
         })
       })
 
@@ -740,7 +723,6 @@ function App() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Previsualizacion de entrada visual antes de transmitir */}
         {selectedImage && (
           <div className="image-preview-bar">
             <div className="image-preview-card">
@@ -773,7 +755,7 @@ function App() {
             type="button"
             className="attach-btn"
             onClick={() => fileInputRef.current?.click()}
-            title="Cargar archivo visual [JPG, PNG, WebP] o presione Ctrl+V"
+            title="Cargar archivo visual [JPG, PNG, WebP] or presione Ctrl+V"
             disabled={loading}
           >
             <IconCamera />
@@ -804,8 +786,8 @@ function App() {
                 isListening
                   ? "TRANSMISIÓN DE AUDIO ACTIVA... ESCUCHANDO..."
                   : selectedImage
-                  ? "Ingrese parámetro de análisis o presione EJECUTAR..."
-                  : "Ingrese comando, consulta de código o pegue imagen [Ctrl+V]..."
+                    ? "Ingrese parámetro de análisis o presione EJECUTAR..."
+                    : "Ingrese comando, consulta de código o pegue imagen [Ctrl+V]..."
               }
               value={input}
               onChange={(e) => setInput(e.target.value)}
