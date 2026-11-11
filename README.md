@@ -6,19 +6,19 @@
 [![IndexedDB](https://img.shields.io/badge/Storage-IndexedDB_(idb--keyval)-orange)](https://github.com/jakearchibald/idb-keyval)
 [![Licencia](https://img.shields.io/badge/Licencia-MIT-green.svg)](LICENSE)
 
-> Sistema de interfaz técnica e inferencia neural multimodal con persistencia local en IndexedDB, captura y síntesis de audio en tiempo real, análisis visual de matrices de imagen y arquitectura de modelos intercambiables (Gemini 2.5 Flash, GPT-4o Mini, DeepSeek V3).
+> Sistema de interfaz técnica e inferencia neural multimodal con persistencia local en IndexedDB, captura y síntesis de audio en tiempo real, análisis visual de matrices de imagen, modulación de voz natural y arquitectura multimodelo (Gemini 2.5 Flash, GPT-4o Mini, DeepSeek V3).
 
 ---
 
-## Indice de Secciones
+## Índice de Secciones
 
 - [Capacidades del Sistema](#capacidades-del-sistema)
-- [Pila Tecnologica](#pila-tecnologica)
+- [Pila Tecnológica](#pila-tecnológica)
 - [Arquitectura de Directorios](#arquitectura-de-directorios)
 - [Requisitos Previos](#requisitos-previos)
-- [Instalacion y Despliegue](#instalacion-y-despliegue)
+- [Instalación y Despliegue](#instalación-y-despliegue)
 - [Variables de Entorno](#variables-de-entorno)
-- [Comandos de Ejecucion](#comandos-de-ejecucion)
+- [Comandos de Ejecución](#comandos-de-ejecución)
 - [Flujo de Procesamiento](#flujo-de-procesamiento)
 - [Compatibilidad de Hardware y Navegadores](#compatibilidad-de-hardware-y-navegadores)
 - [Licencia](#licencia)
@@ -27,33 +27,38 @@
 
 ## Capacidades del Sistema
 
-- **Procesamiento y Analisis Visual**: Carga de imágenes en formatos estándar o pegado directo desde el portapapeles (`Ctrl+V`). Compresión por matriz Canvas en cliente antes del envío e inferencia con modelos multimodales.
-- **Inferencia Neural Multimodelo**: Selector dinámico de motores neurales optimizados:
-  - `google/gemini-2.5-flash`: Inferencia multimodal ultrarrápida para texto y visión.
-  - `openai/gpt-4o-mini`: Procesamiento equilibrado de texto y capacidades visuales.
-  - `deepseek/deepseek-chat`: Inferencia técnica especializada en algoritmos y código.
-- **Transmision Continua de Audio**: Entrada por transductor de voz (Speech-to-Text) continuo mediante Web Speech API, con visualización de ecualizador en tiempo real sin interrupciones por pausas breves.
-- **Sintesis Vocal**: Conversión de texto a habla (Text-to-Speech) nativa en español para reproducir las respuestas generadas por el sistema.
-- **Persistencia en Memoria Local**: Base de datos cliente IndexedDB administrada con `idb-keyval`, garantizando la retención íntegra de historiales y recursos visuales.
-- **Administrador de Sesiones**: Creación, conmutación y purga de registros de sesión con generación automática de identificadores de contexto.
-- **Salida Estructurada de Codigo**: Formateo de código en bloques de consola de alta legibilidad con soporte completo de Markdown técnico.
-- **Interfaz Cyber-Terminal HUD**: Diseño visual de alta tecnología con paleta de neón cian, cuadrícula de circuito, indicadores LED de estado y vectorización SVG pura (sin emojis).
+- **Procesamiento y Análisis Visual**: Carga de imágenes en formatos estándar (JPG, PNG, WebP) o pegado directo desde el portapapeles (`Ctrl+V`). Compresión automática por matriz Canvas en cliente antes del envío para optimizar ancho de banda y almacenamiento en IndexedDB.
+- **Inferencia Neural Multimodelo**: Selector dinámico de motores neurales optimizados en tiempo real:
+  - `google/gemini-2.5-flash`: Inferencia multimodal ultrarrápida para procesamiento combinado de texto y visión.
+  - `openai/gpt-4o-mini`: Procesamiento analítico equilibrado de visión y lenguaje natural.
+  - `deepseek/deepseek-chat`: Inferencia técnica especializada en algoritmos, estructuras de datos y código fuente.
+  - Conmutación automática: Si se adjunta una imagen mientras se utiliza un motor de texto puro, el sistema migra automáticamente la petición a un modelo multimodal para evitar excepciones de API.
+- **Transmisión Continua de Audio (Speech-to-Text)**: Entrada por transductor de voz continuo mediante Web Speech API, con visualización de ecualizador en tiempo real sin interrupciones por silencios o pausas intermedias.
+- **Modulador de Voz Neuronal Natural (Text-to-Speech)**:
+  - Detección dinámica y priorización de voces neuronales de alta fidelidad (`[NATURAL]` de Microsoft Azure en Edge o voces neuronales de Google en Chrome).
+  - Selector de voz en la cabecera (`VOZ:`) para alternar entre diferentes moduladores en español disponibles en el equipo.
+  - Filtro fonético inteligente que elimina marcas de formato Markdown y resume bloques de código para garantizar una cadencia de lectura humana y fluida.
+  - Control de reproducción con estado activo (`DETENER AUDIO`), ondas sonoras y mecanismo de protección contra pausas automáticas en textos extensos.
+- **Persistencia en Memoria Local**: Base de datos cliente IndexedDB administrada mediante `idb-keyval`, garantizando la retención íntegra de sesiones, mensajes e imágenes sin necesidad de bases de datos externas.
+- **Administrador Multi-Sesión**: Creación, conmutación y eliminación de historiales con asignación automática de identificadores de contexto.
+- **Salida Estructurada de Código**: Renderizado de código en bloques de consola de alta legibilidad con soporte completo de Markdown técnico y sintaxis coloreada.
+- **Interfaz Cyber-Terminal HUD**: Diseño visual de alta tecnología con paleta de neón cian, cuadrícula de circuito, indicadores LED de estado, línea de comandos con prompt (`>`) y vectorización SVG pura (sin emojis).
 
 ---
 
-## Pila Tecnologica
+## Pila Tecnológica
 
-| Componente | Especificacion |
-| :--- | :--- |
-| **Nucleo Frontend** | React 19 |
-| **Empaquetador / Servidor** | Vite |
-| **Pasarela de Inferencia** | OpenRouter API |
-| **Almacenamiento Local** | IndexedDB (`idb-keyval`) |
-| **Captura de Audio** | Web Speech API (`SpeechRecognition`) |
-| **Sintesis Vocal** | Web Speech Synthesis API (`SpeechSynthesis`) |
-| **Procesamiento Markdown** | `react-markdown` |
-| **Optimizador de Imagenes** | HTML5 Canvas API |
-| **Estilos e Iconografia** | CSS3 Grid/Flexbox + SVG vectorial |
+| Componente | Tecnología | Propósito |
+| :--- | :--- | :--- |
+| **Núcleo de Interfaz** | React 19 | Biblioteca principal para la arquitectura de componentes reactivos. |
+| **Compilador / Servidor** | Vite | Herramienta de compilación ultrarrápida y servidor de desarrollo HMR. |
+| **Pasarela de Inferencia** | OpenRouter API | Enrutamiento unificado hacia modelos Gemini, GPT y DeepSeek. |
+| **Almacenamiento Local** | IndexedDB (`idb-keyval`) | Persistencia asíncrona de sesiones e imágenes en el navegador. |
+| **Captura de Voz (STT)** | Web Speech API | Transcripción de audio a texto continuo en tiempo real. |
+| **Síntesis Vocal (TTS)** | Web Speech Synthesis API | Modulación de voz neuronal nativa en español. |
+| **Procesador de Formato** | `react-markdown` | Renderizado seguro de respuestas Markdown y bloques de código. |
+| **Compresión Visual** | HTML5 Canvas API | Redimensionamiento y optimización de imágenes en el cliente. |
+| **Estilos e Iconografía** | CSS3 Grid/Flexbox + SVG | Diseño tecnológico estilo terminal HUD con gráficos vectoriales. |
 
 ---
 
@@ -61,36 +66,37 @@
 
 ```text
 asistente-feria/
-├── public/                 # Recursos publicos y vectores base
+├── public/                 # Recursos públicos y vectores base
 │   ├── favicon.svg
 │   └── icons.svg
 ├── src/
-│   ├── assets/             # Graficos y dependencias estaticas
-│   ├── App.css             # Especificaciones tecnicas de interfaz y estilos HUD
-│   ├── App.jsx             # Logica de procesamiento neural, audio y estado
+│   ├── assets/             # Recursos estáticos del proyecto
+│   ├── App.css             # Especificaciones técnicas de estilos Cyber-Terminal HUD
+│   ├── App.jsx             # Lógica de inferencia neural, audio, visión y estado
 │   ├── index.css           # Capa de estilos base
-│   └── main.jsx            # Punto de montaje de React
-├── .env.example            # Plantilla de variables de entorno
-├── .gitignore              # Modulos y registros excluidos de Git
-├── eslint.config.js        # Reglas de sintaxis y analisis estatico
-├── index.html              # Estructura del documento raiz
-├── package.json            # Dependencias del proyecto
-├── README.md               # Documentacion tecnica en espanol
-└── vite.config.js          # Configuracion de compilacion Vite
+│   └── main.jsx            # Punto de montaje de la aplicación React
+├── .env                    # Variables de entorno locales (ignorado por Git)
+├── .env.example            # Plantilla estructurada de variables de entorno
+├── .gitignore              # Módulos y registros excluidos de control de versiones
+├── eslint.config.js        # Reglas de sintaxis y análisis estático
+├── index.html              # Estructura del documento raíz
+├── package.json            # Manifiesto de dependencias y scripts
+├── README.md               # Documentación técnica completa
+└── vite.config.js          # Configuración del compilador Vite
 ```
 
 ---
 
 ## Requisitos Previos
 
-- Entorno de ejecucion Node.js (v18.0 o superior).
-- Gestor de dependencias npm, yarn o pnpm.
-- Clave de autenticacion de OpenRouter ([openrouter.ai](https://openrouter.ai/keys)).
-- Navegador compatible con Web Speech API (Google Chrome o Microsoft Edge recomendado).
+- Entorno de ejecución [Node.js](https://nodejs.org/) (versión 18.0 o superior recomendada).
+- Gestor de dependencias `npm`, `yarn` o `pnpm`.
+- Clave de autenticación de [OpenRouter](https://openrouter.ai/keys).
+- Navegador compatible con Web Speech API y voces neuronales (se recomienda **Google Chrome** o **Microsoft Edge**).
 
 ---
 
-## Instalacion y Despliegue
+## Instalación y Despliegue
 
 ### 1. Navegar al directorio del proyecto
 
@@ -98,13 +104,13 @@ asistente-feria/
 cd asistente-feria
 ```
 
-### 2. Instalar modulos y dependencias
+### 2. Instalar módulos y dependencias
 
 ```bash
 npm install
 ```
 
-### 3. Configurar parametros de entorno
+### 3. Configurar parámetros de entorno
 
 Generar el archivo `.env` a partir de la plantilla:
 
@@ -128,24 +134,26 @@ VITE_OPENROUTER_API_KEY=sk-or-v1-su-clave-aqui
 npm run dev
 ```
 
+La consola indicará la dirección local de acceso (habitualmente `http://localhost:5173`).
+
 ---
 
 ## Variables de Entorno
 
-| Variable | Requerido | Descripcion |
+| Variable | Requerido | Descripción |
 | :--- | :---: | :--- |
-| `VITE_OPENROUTER_API_KEY` | Si | Clave de acceso a la pasarela de OpenRouter (`sk-or-v1-...`). |
+| `VITE_OPENROUTER_API_KEY` | Sí | Clave de acceso a la pasarela de OpenRouter (`sk-or-v1-...`). |
 
 ---
 
-## Comandos de Ejecucion
+## Comandos de Ejecución
 
-| Comando | Proposito |
+| Comando | Acción |
 | :--- | :--- |
-| `npm run dev` | Inicia el entorno de desarrollo local con recarga en caliente (HMR). |
-| `npm run build` | Compila los paquetes optimizados para distribucion en produccion (`dist/`). |
-| `npm run preview` | Ejecuta un servidor local para inspeccionar la compilacion de produccion. |
-| `npm run lint` | Ejecuta el validador estatico de codigo ESLint. |
+| `npm run dev` | Inicia el servidor de desarrollo local con recarga en caliente (HMR). |
+| `npm run build` | Compila los paquetes optimizados para producción en la carpeta `dist/`. |
+| `npm run preview` | Ejecuta un servidor local para previsualizar la compilación de producción. |
+| `npm run lint` | Ejecuta el analizador estático de código ESLint. |
 
 ---
 
@@ -154,8 +162,8 @@ npm run dev
 ```text
   [OPERADOR]
       │
-      ├──> Transmision de Audio ──> Web Speech API ────┐
-      ├──> Carga Visual / Paste ─> Canvas Optimizer ───┼──> Estado de Sesion
+      ├──> Transmisión de Audio ──> Web Speech API ────┐
+      ├──> Carga Visual / Paste ─> Canvas Optimizer ───┼──> Estado de Sesión
       └──> Entrada de Comando ────────────────────────┘            │
                                                                    ▼
                                                          IndexedDB (idb-keyval)
@@ -169,19 +177,20 @@ npm run dev
                                                                    │
                                                       ┌────────────┴────────────┐
                                                       ▼                         ▼
-                                                Render Markdown          Sintesis Vocal
+                                                Render Markdown          Síntesis Vocal
+                                            (Consola de Código)       (Modulador Natural)
 ```
 
 ---
 
 ## Compatibilidad de Hardware y Navegadores
 
-- **Motor de Renderizado y Persistencia**: Totalmente compatible con navegadores basados en Blink, Gecko y WebKit (Chrome, Edge, Firefox, Brave, Safari, Opera).
-- **Transductor de Audio (Voz)**: Optimizada para motores Chromium (Google Chrome, Microsoft Edge) con permisos de microfono autorizados.
-- **Sintesis de Voz**: Compatible de forma nativa en todos los navegadores modernos a traves de `window.speechSynthesis`.
+- **Motor de Renderizado e IndexedDB**: Totalmente compatible con todos los navegadores modernos basados en Blink, Gecko y WebKit (Chrome, Edge, Firefox, Brave, Safari, Opera).
+- **Transductor de Audio (Voz a Texto)**: Optimizado para navegadores Chromium (**Google Chrome**, **Microsoft Edge**) con permisos de micrófono concedidos.
+- **Síntesis Vocal (Texto a Voz Natural)**: Compatible de forma nativa a través de `window.speechSynthesis`. Para obtener la máxima naturalidad y voces neuronales, se recomienda **Microsoft Edge** (voces *Online Natural* de Azure) o **Google Chrome** (voces neuronales de Google Cloud).
 
 ---
 
 ## Licencia
 
-Distribuido bajo los terminos de la Licencia [MIT](LICENSE).
+Distribuido bajo los términos de la Licencia [MIT](LICENSE).
